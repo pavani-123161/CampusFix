@@ -13,8 +13,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const signupMessage = document.getElementById("signupMessage");
 
 
-    // Switch to Login
-    loginTab.addEventListener("click", () => {
+    // =========================================
+    // SWITCH TO LOGIN
+    // =========================================
+
+    loginTab.addEventListener("click", (event) => {
+
+        event.preventDefault();
 
         loginTab.classList.add("active");
         signupTab.classList.remove("active");
@@ -23,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
         signupForm.classList.add("hidden");
 
         authTitle.textContent = "Welcome back";
+
         authSubtitle.textContent =
             "Login to continue to your campus dashboard.";
 
@@ -30,8 +36,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // Switch to Signup
-    signupTab.addEventListener("click", () => {
+    // =========================================
+    // SWITCH TO SIGNUP
+    // =========================================
+
+    signupTab.addEventListener("click", (event) => {
+
+        event.preventDefault();
 
         signupTab.classList.add("active");
         loginTab.classList.remove("active");
@@ -40,14 +51,17 @@ document.addEventListener("DOMContentLoaded", () => {
         loginForm.classList.add("hidden");
 
         authTitle.textContent = "Join CampusFix";
+
         authSubtitle.textContent =
             "Create your student account and start making a difference.";
 
         clearMessages();
     });
 
+    // =========================================
+    // STUDENT SIGNUP
+    // =========================================
 
-    // Student Signup
     signupForm.addEventListener("submit", (event) => {
 
         event.preventDefault();
@@ -56,7 +70,11 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("signupName").value.trim();
 
         const email =
-            document.getElementById("signupEmail").value.trim().toLowerCase();
+            document
+                .getElementById("signupEmail")
+                .value
+                .trim()
+                .toLowerCase();
 
         const password =
             document.getElementById("signupPassword").value;
@@ -78,7 +96,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         const users =
-            JSON.parse(localStorage.getItem("campus_users")) || [];
+            JSON.parse(
+                localStorage.getItem("campus_users")
+            ) || [];
 
 
         const existingUser =
@@ -98,10 +118,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         const newUser = {
+
             id: "user-" + Date.now(),
+
             name: name,
+
             email: email,
+
             password: password,
+
             role: "student"
         };
 
@@ -127,44 +152,71 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
             loginTab.click();
         }, 1200);
-
     });
 
 
-    // Login
+    // =========================================
+    // LOGIN
+    // =========================================
+
     loginForm.addEventListener("submit", (event) => {
 
         event.preventDefault();
 
         const email =
-            document.getElementById("loginEmail").value.trim().toLowerCase();
+            document
+                .getElementById("loginEmail")
+                .value
+                .trim()
+                .toLowerCase();
 
         const password =
-            document.getElementById("loginPassword").value;
+            document
+                .getElementById("loginPassword")
+                .value;
 
-        const selectedRole =
+
+        const selectedRoleElement =
             document.querySelector(
                 'input[name="loginRole"]:checked'
-            ).value;
+            );
 
 
-        /*
-         * Demo admin account.
-         *
-         * IMPORTANT:
-         * This is prototype authentication only.
-         * It is NOT secure production authentication.
-         */
-        const adminAccount = {
-            email: "admin@campusfix.demo",
-            password: "admin123",
-            name: "Campus Administrator",
-            role: "admin"
-        };
+        if (!selectedRoleElement) {
+
+            showMessage(
+                loginMessage,
+                "Please select Student or Admin.",
+                "error"
+            );
+
+            return;
+        }
 
 
-        // Admin login
+        const selectedRole =
+            selectedRoleElement.value;
+
+
+        // =========================================
+        // ADMIN LOGIN
+        // =========================================
+
         if (selectedRole === "admin") {
+
+            const adminAccount = {
+
+                id: "admin-1",
+
+                email: "admin@campusfix.demo",
+
+                password: "admin123",
+
+                name: "Campus Administrator",
+
+                role: "admin"
+            };
+
 
             if (
                 email === adminAccount.email &&
@@ -173,14 +225,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 createSession(adminAccount);
 
+
                 showMessage(
                     loginMessage,
                     "Admin login successful!",
                     "success"
                 );
 
+
                 setTimeout(() => {
-                    window.location.href = "index.html";
+
+                    window.location.href =
+                        "index.html";
+
                 }, 700);
 
             } else {
@@ -196,17 +253,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        // Student login
+        // =========================================
+        // STUDENT LOGIN
+        // =========================================
+
         const users =
-            JSON.parse(localStorage.getItem("campus_users")) || [];
+            JSON.parse(
+                localStorage.getItem("campus_users")
+            ) || [];
 
 
-        const user = users.find(
-            user =>
-                user.email === email &&
-                user.password === password &&
-                user.role === "student"
-        );
+        const user =
+            users.find(
+                user =>
+                    user.email === email &&
+                    user.password === password &&
+                    user.role === "student"
+            );
 
 
         if (!user) {
@@ -232,20 +295,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         setTimeout(() => {
-            window.location.href = "index.html";
-        }, 700);
 
+            window.location.href =
+                "index.html";
+
+        }, 700);
     });
 
+
+    // =========================================
+    // CREATE SESSION
+    // =========================================
 
     function createSession(user) {
 
         const session = {
+
             id: user.id,
+
             name: user.name,
+
             email: user.email,
+
             role: user.role,
-            loginTime: new Date().toISOString()
+
+            loginTime:
+                new Date().toISOString()
         };
 
 
@@ -256,6 +331,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    // =========================================
+    // SHOW MESSAGE
+    // =========================================
+
     function showMessage(element, message, type) {
 
         element.textContent = message;
@@ -265,13 +344,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    // =========================================
+    // CLEAR MESSAGES
+    // =========================================
+
     function clearMessages() {
 
         loginMessage.textContent = "";
-        loginMessage.className = "auth-message";
+
+        loginMessage.className =
+            "auth-message";
+
 
         signupMessage.textContent = "";
-        signupMessage.className = "auth-message";
+
+        signupMessage.className =
+            "auth-message";
     }
 
 });

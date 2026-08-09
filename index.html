@@ -26,7 +26,13 @@
 
         <nav>
             <a href="#dashboard">Dashboard</a>
-            <a href="#report">Report Issue</a>
+            <a href="#report" id="reportNav">Report Issue</a>
+
+            <span class="user-welcome" id="userWelcome"></span>
+
+            <button id="logoutBtn" class="logout-btn">
+                Logout
+            </button>
         </nav>
     </header>
 
@@ -308,8 +314,10 @@
     <section class="issues section">
 
         <div class="section-heading">
-            <h2>Reported Issues</h2>
-            <p>View and track campus problems.</p>
+            <h2 id="issuesHeading">Reported Issues</h2>
+            <p id="issuesSubtitle">
+                View and track campus problems.
+            </p>
         </div>
 
         <div class="issue-controls">

@@ -1,33 +1,142 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // =========================================
+    // AUTHENTICATION & ROLE MANAGEMENT
+    // =========================================
+
+    const currentUser = JSON.parse(
+        localStorage.getItem('campus_current_user')
+    );
+
+    const userWelcome = document.getElementById('userWelcome');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const reportSection = document.getElementById('report');
+    const reportNav = document.getElementById('reportNav');
+    const issuesHeading = document.getElementById('issuesHeading');
+    const issuesSubtitle = document.getElementById('issuesSubtitle');
+
+    // Prevent access without login
+    if (!currentUser) {
+        window.location.href = 'auth.html';
+        return;
+    }
+
+    // Display logged-in user
+    if (userWelcome) {
+        if (currentUser.role === 'admin') {
+            userWelcome.textContent = `🛡️ ${currentUser.name}`;
+        } else {
+            userWelcome.textContent = `👋 ${currentUser.name}`;
+        }
+    }
+
+    // =========================================
+    // ROLE-BASED PAGE CONFIGURATION
+    // =========================================
+
+    if (currentUser.role === 'admin') {
+
+        // Admin cannot report issues
+        if (reportSection) {
+            reportSection.style.display = 'none';
+        }
+
+        if (reportNav) {
+            reportNav.style.display = 'none';
+        }
+
+        if (issuesHeading) {
+            issuesHeading.textContent = 'All Campus Issues';
+        }
+
+        if (issuesSubtitle) {
+            issuesSubtitle.textContent =
+                'Manage and track reported campus problems.';
+        }
+
+    } else {
+
+        // Student can report issues
+        if (issuesHeading) {
+            issuesHeading.textContent = 'My Reported Issues';
+        }
+
+        if (issuesSubtitle) {
+            issuesSubtitle.textContent =
+                'Track the issues you have reported.';
+        }
+    }
+
+    // =========================================
+    // LOGOUT
+    // =========================================
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+
+            localStorage.removeItem('campus_current_user');
+
+            window.location.href = 'auth.html';
+        });
+    }
+
+    // =========================================
     // DOM ELEMENTS
     // =========================================
 
-    const totalIssuesEl = document.getElementById('totalIssues');
-    const pendingIssuesEl = document.getElementById('pendingIssues');
-    const progressIssuesEl = document.getElementById('progressIssues');
-    const resolvedIssuesEl = document.getElementById('resolvedIssues');
+    const totalIssuesEl =
+        document.getElementById('totalIssues');
 
-    const resolutionRateEl = document.getElementById('resolutionRate');
-    const healthProgressBar = document.getElementById('healthProgressBar');
-    const healthMessageEl = document.getElementById('healthMessage');
-    const healthCountEl = document.getElementById('healthCount');
+    const pendingIssuesEl =
+        document.getElementById('pendingIssues');
 
-    const issueForm = document.getElementById('issueForm');
+    const progressIssuesEl =
+        document.getElementById('progressIssues');
 
-    const issueTitleInput = document.getElementById('issueTitle');
-    const categorySelect = document.getElementById('category');
-    const locationInput = document.getElementById('location');
-    const prioritySelect = document.getElementById('priority');
-    const descriptionInput = document.getElementById('description');
+    const resolvedIssuesEl =
+        document.getElementById('resolvedIssues');
+
+    const resolutionRateEl =
+        document.getElementById('resolutionRate');
+
+    const healthProgressBar =
+        document.getElementById('healthProgressBar');
+
+    const healthMessageEl =
+        document.getElementById('healthMessage');
+
+    const healthCountEl =
+        document.getElementById('healthCount');
+
+    const issueForm =
+        document.getElementById('issueForm');
+
+    const issueTitleInput =
+        document.getElementById('issueTitle');
+
+    const categorySelect =
+        document.getElementById('category');
+
+    const locationInput =
+        document.getElementById('location');
+
+    const prioritySelect =
+        document.getElementById('priority');
+
+    const descriptionInput =
+        document.getElementById('description');
 
     const prioritySuggestionEl =
         document.getElementById('prioritySuggestion');
 
-    const searchInput = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('statusFilter');
-    const issueListContainer = document.getElementById('issueList');
+    const searchInput =
+        document.getElementById('searchInput');
+
+    const statusFilter =
+        document.getElementById('statusFilter');
+
+    const issueListContainer =
+        document.getElementById('issueList');
 
 
     // =========================================
@@ -35,6 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================
 
     const mockIssues = [
+
         {
             id: 'issue-1',
             title: 'Water leakage in Library Restroom',
@@ -46,7 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
             status: 'In Progress',
             date: new Date(
                 Date.now() - 24 * 60 * 60 * 1000
-            ).toISOString()
+            ).toISOString(),
+            reportedBy: 'demo-student'
         },
 
         {
@@ -60,7 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
             status: 'Pending',
             date: new Date(
                 Date.now() - 2 * 60 * 60 * 1000
-            ).toISOString()
+            ).toISOString(),
+            reportedBy: 'demo-student'
         },
 
         {
@@ -74,20 +186,23 @@ document.addEventListener('DOMContentLoaded', () => {
             status: 'Resolved',
             date: new Date(
                 Date.now() - 3 * 24 * 60 * 60 * 1000
-            ).toISOString()
+            ).toISOString(),
+            reportedBy: 'demo-student'
         }
+
     ];
 
 
     // =========================================
-    // LOAD ISSUES
+    // LOAD ISSUES FROM LOCAL STORAGE
     // =========================================
 
     let issues = JSON.parse(
         localStorage.getItem('campus_issues')
     );
 
-    if (!issues || issues.length === 0) {
+    if (!issues || !Array.isArray(issues)) {
+
         issues = mockIssues;
 
         localStorage.setItem(
@@ -98,14 +213,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // =========================================
-    // MAIN RENDER FUNCTION
+    // MAIN RENDER
     // =========================================
 
     function render() {
+
         calculateStats();
+
         calculateCampusHealth();
+
         renderIssues();
+
         renderCategoryInsights();
+
         renderRecentActivity();
     }
 
@@ -131,10 +251,25 @@ document.addEventListener('DOMContentLoaded', () => {
         ).length;
 
 
-        animateCount(totalIssuesEl, total);
-        animateCount(pendingIssuesEl, pending);
-        animateCount(progressIssuesEl, progress);
-        animateCount(resolvedIssuesEl, resolved);
+        animateCount(
+            totalIssuesEl,
+            total
+        );
+
+        animateCount(
+            pendingIssuesEl,
+            pending
+        );
+
+        animateCount(
+            progressIssuesEl,
+            progress
+        );
+
+        animateCount(
+            resolvedIssuesEl,
+            resolved
+        );
     }
 
 
@@ -144,7 +279,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function calculateCampusHealth() {
 
-        // Prevent errors if these elements don't exist
         if (
             !resolutionRateEl ||
             !healthProgressBar ||
@@ -163,25 +297,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const resolutionRate =
             total === 0
                 ? 0
-                : Math.round((resolved / total) * 100);
+                : Math.round(
+                    (resolved / total) * 100
+                );
 
 
-        // Percentage
         resolutionRateEl.textContent =
             `${resolutionRate}%`;
 
 
-        // Progress bar
         healthProgressBar.style.width =
             `${resolutionRate}%`;
 
 
-        // Count
         healthCountEl.textContent =
             `${resolved} of ${total} resolved`;
 
 
-        // Message
         if (total === 0) {
 
             healthMessageEl.textContent =
@@ -227,10 +359,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const duration = 400;
 
+        const difference =
+            target - start;
+
         const stepTime =
             Math.abs(
                 Math.floor(
-                    duration / (target - start || 1)
+                    duration /
+                    (difference || 1)
                 )
             );
 
@@ -242,7 +378,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             current += increment;
 
-            element.textContent = current;
+            element.textContent =
+                current;
 
             if (current === target) {
                 clearInterval(timer);
@@ -259,7 +396,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderCategoryInsights() {
 
         const categoryInsights =
-            document.getElementById('categoryInsights');
+            document.getElementById(
+                'categoryInsights'
+            );
 
         if (!categoryInsights) return;
 
@@ -271,13 +410,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             categoryCounts[issue.category] =
                 (categoryCounts[issue.category] || 0) + 1;
-
         });
 
 
         const categories =
             Object.entries(categoryCounts)
-                .sort((a, b) => b[1] - a[1]);
+                .sort(
+                    (a, b) => b[1] - a[1]
+                );
 
 
         if (categories.length === 0) {
@@ -292,44 +432,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
 
-        const maxCount = categories[0][1];
+        const maxCount =
+            categories[0][1];
 
 
         categoryInsights.innerHTML =
-            categories.map(([category, count]) => {
+            categories.map(
+                ([category, count]) => {
 
-                const percentage =
-                    (count / maxCount) * 100;
+                    const percentage =
+                        (count / maxCount) * 100;
 
 
-                return `
-                    <div class="insight-row">
+                    return `
+                        <div class="insight-row">
 
-                        <div class="insight-label">
+                            <div class="insight-label">
 
-                            <span>
-                                ${escapeHTML(category)}
-                            </span>
+                                <span>
+                                    ${escapeHTML(category)}
+                                </span>
 
-                            <strong>
-                                ${count}
-                            </strong>
+                                <strong>
+                                    ${count}
+                                </strong>
+
+                            </div>
+
+                            <div class="insight-bar">
+
+                                <div
+                                    class="insight-fill"
+                                    style="width: ${percentage}%"
+                                ></div>
+
+                            </div>
 
                         </div>
+                    `;
 
-                        <div class="insight-bar">
-
-                            <div
-                                class="insight-fill"
-                                style="width: ${percentage}%"
-                            ></div>
-
-                        </div>
-
-                    </div>
-                `;
-
-            }).join('');
+                }
+            ).join('');
     }
 
 
@@ -340,7 +483,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderRecentActivity() {
 
         const activityList =
-            document.getElementById('activityList');
+            document.getElementById(
+                'activityList'
+            );
 
         if (!activityList) return;
 
@@ -364,7 +509,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         📋
                     </div>
 
-                    <h3>No Recent Activity</h3>
+                    <h3>
+                        No Recent Activity
+                    </h3>
 
                     <p>
                         Campus activity will appear here
@@ -387,14 +534,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     'New issue reported';
 
 
-                if (issue.status === 'In Progress') {
+                if (
+                    issue.status === 'In Progress'
+                ) {
 
                     icon = '🟡';
 
                     activityText =
                         'Issue in progress';
 
-                } else if (issue.status === 'Resolved') {
+                } else if (
+                    issue.status === 'Resolved'
+                ) {
 
                     icon = '🟢';
 
@@ -463,7 +614,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const searchTerm =
             searchInput
-                ? searchInput.value.toLowerCase().trim()
+                ? searchInput.value
+                    .toLowerCase()
+                    .trim()
                 : '';
 
 
@@ -473,26 +626,58 @@ document.addEventListener('DOMContentLoaded', () => {
                 : 'All';
 
 
-        // Filter issues
+        // -----------------------------------------
+        // ROLE-BASED VISIBILITY
+        // -----------------------------------------
+
+        let visibleIssues = [];
+
+
+        if (currentUser.role === 'admin') {
+
+            // Admin sees everything
+            visibleIssues = [...issues];
+
+        } else {
+
+            // Student sees only their own issues
+            visibleIssues = issues.filter(
+                issue =>
+                    issue.reportedBy ===
+                    currentUser.id
+            );
+        }
+
+
+        // -----------------------------------------
+        // SEARCH + STATUS FILTER
+        // -----------------------------------------
+
         const filteredIssues =
-            issues.filter(issue => {
+            visibleIssues.filter(issue => {
+
+                const title =
+                    String(issue.title || '')
+                        .toLowerCase();
+
+                const description =
+                    String(issue.description || '')
+                        .toLowerCase();
+
+                const location =
+                    String(issue.location || '')
+                        .toLowerCase();
+
+                const category =
+                    String(issue.category || '')
+                        .toLowerCase();
+
 
                 const matchesSearch =
-                    issue.title
-                        .toLowerCase()
-                        .includes(searchTerm) ||
-
-                    issue.description
-                        .toLowerCase()
-                        .includes(searchTerm) ||
-
-                    issue.location
-                        .toLowerCase()
-                        .includes(searchTerm) ||
-
-                    issue.category
-                        .toLowerCase()
-                        .includes(searchTerm);
+                    title.includes(searchTerm) ||
+                    description.includes(searchTerm) ||
+                    location.includes(searchTerm) ||
+                    category.includes(searchTerm);
 
 
                 const matchesStatus =
@@ -507,12 +692,24 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
 
-        // Clear existing cards
+        // -----------------------------------------
+        // CLEAR CONTAINER
+        // -----------------------------------------
+
         issueListContainer.innerHTML = '';
 
 
-        // No results
+        // -----------------------------------------
+        // NO RESULTS
+        // -----------------------------------------
+
         if (filteredIssues.length === 0) {
+
+            const message =
+                currentUser.role === 'student'
+                    ? 'You have not reported any issues yet.'
+                    : 'Try refining your search keyword or changing status filters.';
+
 
             issueListContainer.innerHTML = `
                 <div class="empty-state">
@@ -526,8 +723,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </h3>
 
                     <p>
-                        Try refining your search keyword
-                        or changing status filters.
+                        ${escapeHTML(message)}
                     </p>
 
                 </div>
@@ -537,7 +733,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
 
-        // Create issue cards
+        // -----------------------------------------
+        // CREATE ISSUE CARDS
+        // -----------------------------------------
+
         filteredIssues.forEach(issue => {
 
             const card =
@@ -545,10 +744,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
             card.className =
-                `issue-card priority-${issue.priority.toLowerCase()}`;
+                `issue-card priority-${String(
+                    issue.priority
+                ).toLowerCase()}`;
 
 
-            // Format date
             const formattedDate =
                 new Date(issue.date)
                     .toLocaleDateString(
@@ -563,20 +763,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     );
 
 
-            // Classes
             const statusClass =
-                issue.status
+                String(issue.status)
                     .toLowerCase()
                     .replace(/\s+/g, '-');
 
 
             const priorityClass =
-                issue.priority.toLowerCase();
+                String(issue.priority)
+                    .toLowerCase();
 
 
-            // =========================================
-            // ISSUE CARD HTML
-            // =========================================
+            // -----------------------------------------
+            // ISSUE CARD
+            // -----------------------------------------
 
             card.innerHTML = `
 
@@ -650,23 +850,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     </button>
 
                 </div>
-
             `;
 
 
-            // =========================================
+            // -----------------------------------------
             // STATUS BUTTON
-            // =========================================
+            // -----------------------------------------
 
             const statusBtn =
-                card.querySelector('.status-btn');
+                card.querySelector(
+                    '.status-btn'
+                );
 
 
             if (statusBtn) {
 
                 statusBtn.addEventListener(
                     'click',
-                    (event) => {
+                    event => {
 
                         event.preventDefault();
 
@@ -678,25 +879,34 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
 
-            // =========================================
+            // -----------------------------------------
             // DELETE BUTTON
-            // =========================================
+            // -----------------------------------------
 
-            const deleteBtn = card.querySelector('.delete-btn');
+            const deleteBtn =
+                card.querySelector(
+                    '.delete-btn'
+                );
+
 
             if (deleteBtn) {
-                deleteBtn.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
 
-                    deleteIssue(issue.id);
-                });
+                deleteBtn.addEventListener(
+                    'click',
+                    event => {
+
+                        event.preventDefault();
+
+                        event.stopPropagation();
+
+                        deleteIssue(issue.id);
+                    }
+                );
             }
 
 
-            // Add card to page
+            // Add card
             issueListContainer.appendChild(card);
-
         });
     }
 
@@ -709,41 +919,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
         issueForm.addEventListener(
             'submit',
-            (e) => {
+            event => {
 
-                e.preventDefault();
+                event.preventDefault();
 
 
                 const newIssue = {
+                    id: 'issue-' + Date.now(),
+                    title: issueTitleInput.value.trim(),
+                    category: categorySelect.value,
+                    location: locationInput.value.trim(),
+                    priority: prioritySelect.value,
+                    description: descriptionInput.value.trim(),
+                    status: 'Pending',
+                    date: new Date().toISOString(),
 
-                    id:
-                        'issue-' +
-                        Date.now(),
-
-                    title:
-                        issueTitleInput.value.trim(),
-
-                    category:
-                        categorySelect.value,
-
-                    location:
-                        locationInput.value.trim(),
-
-                    priority:
-                        prioritySelect.value,
-
-                    description:
-                        descriptionInput.value.trim(),
-
-                    status:
-                        'Pending',
-
-                    date:
-                        new Date().toISOString()
+                    // Store which student reported the issue
+                    reportedBy: currentUser.id,
+                    reportedByName: currentUser.name
                 };
 
 
-                // Add issue to beginning
+                // Add to beginning
                 issues.unshift(newIssue);
 
 
@@ -751,7 +948,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveIssues();
 
 
-                // Update UI
+                // Update dashboard
                 render();
 
 
@@ -759,16 +956,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 issueForm.reset();
 
 
+                // Reset suggestion
                 if (prioritySuggestionEl) {
 
-                    prioritySuggestionEl
-                        .classList
-                        .remove(
-                            'active',
-                            'high',
-                            'medium',
-                            'low'
-                        );
+                    prioritySuggestionEl.classList.remove(
+                        'active',
+                        'high',
+                        'medium',
+                        'low'
+                    );
 
                     prioritySuggestionEl.innerHTML = '';
                 }
@@ -832,11 +1028,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const issue =
             issues.find(
-                issue => issue.id === id
+                item => item.id === id
             );
 
 
         if (!issue) return;
+
+
+        // Only admin should change issue status
+        if (currentUser.role !== 'admin') {
+
+            alert(
+                'Only the campus administrator can update issue status.'
+            );
+
+            return;
+        }
 
 
         if (issue.status === 'Pending') {
@@ -870,26 +1077,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function deleteIssue(id) {
 
-        console.log("deleteIssue called:", id);
+        const issue =
+            issues.find(
+                item => item.id === id
+            );
 
-        const issue = issues.find(issue => issue.id === id);
 
         if (!issue) {
-            console.log("Issue not found:", id);
             return;
         }
 
-        // Remove the issue
-        issues = issues.filter(issue => issue.id !== id);
 
-        // Save updated issues
+        // Students can only delete their own issues
+        if (
+            currentUser.role === 'student' &&
+            issue.reportedBy !== currentUser.id
+        ) {
+
+            alert(
+                'You can only delete your own issues.'
+            );
+
+            return;
+        }
+
+
+        const confirmed =
+            confirm(
+                `Are you sure you want to delete "${issue.title}"?`
+            );
+
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        issues =
+            issues.filter(
+                item => item.id !== id
+            );
+
+
         saveIssues();
 
-        // Re-render everything
         render();
-
-        console.log("Issue deleted successfully:", issue.title);
     }
+
 
     // =========================================
     // SAVE ISSUES
@@ -960,14 +1194,12 @@ document.addEventListener('DOMContentLoaded', () => {
             description.length < 5
         ) {
 
-            prioritySuggestionEl
-                .classList
-                .remove(
-                    'active',
-                    'high',
-                    'medium',
-                    'low'
-                );
+            prioritySuggestionEl.classList.remove(
+                'active',
+                'high',
+                'medium',
+                'low'
+            );
 
             prioritySuggestionEl.innerHTML = '';
 
@@ -978,7 +1210,10 @@ document.addEventListener('DOMContentLoaded', () => {
         let suggestedPriority = 'Low';
 
 
-        // High priority keywords
+        // -----------------------------------------
+        // HIGH PRIORITY KEYWORDS
+        // -----------------------------------------
+
         const highKeywords = [
 
             'leak',
@@ -1027,7 +1262,10 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
 
 
-        // Medium priority keywords
+        // -----------------------------------------
+        // MEDIUM PRIORITY KEYWORDS
+        // -----------------------------------------
+
         const mediumKeywords = [
 
             'slow',
@@ -1103,7 +1341,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
 
-        // Display suggestion
+        // -----------------------------------------
+        // DISPLAY SUGGESTION
+        // -----------------------------------------
+
         prioritySuggestionEl.className =
             'suggestion-text active ' +
             suggestedPriority.toLowerCase();
@@ -1141,7 +1382,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // Priority listeners
+    // =========================================
+    // PRIORITY LISTENERS
+    // =========================================
+
     if (categorySelect) {
 
         categorySelect.addEventListener(
@@ -1162,12 +1406,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // =========================================
     // ESCAPE HTML
-    // Prevent HTML injection
     // =========================================
 
-    function escapeHTML(str) {
+    function escapeHTML(value) {
 
-        return String(str)
+        return String(value ?? '')
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
