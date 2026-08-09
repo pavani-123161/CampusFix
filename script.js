@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const locationInput = document.getElementById('location');
     const prioritySelect = document.getElementById('priority');
     const descriptionInput = document.getElementById('description');
+    const prioritySuggestionEl = document.getElementById('prioritySuggestion');
     
     const searchInput = document.getElementById('searchInput');
     const statusFilter = document.getElementById('statusFilter');
@@ -211,6 +212,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Reset form and scroll to issues list
         issueForm.reset();
+        prioritySuggestionEl.classList.remove('active', 'high', 'medium', 'low');
+        prioritySuggestionEl.innerHTML = '';
         
         // Custom visual cue for submit success
         const submitBtn = issueForm.querySelector('.primary-btn');
@@ -261,6 +264,60 @@ document.addEventListener('DOMContentLoaded', () => {
     // Search and Filter Event Listeners
     searchInput.addEventListener('input', renderIssues);
     statusFilter.addEventListener('change', renderIssues);
+
+    // Smart Priority Suggestion logic
+    function updatePrioritySuggestion() {
+        const category = categorySelect.value;
+        const description = descriptionInput.value.trim().toLowerCase();
+
+        if (!category || description.length < 5) {
+            prioritySuggestionEl.classList.remove('active', 'high', 'medium', 'low');
+            prioritySuggestionEl.innerHTML = '';
+            return;
+        }
+
+        let suggestedPriority = 'Low';
+
+        const highKeywords = [
+            'leak', 'flood', 'burst', 'overflow', 'water logging', 'flooding',
+            'spark', 'smoke', 'fire', 'shock', 'exposed', 'outage', 'blackout', 'live wire', 'power cut',
+            'offline', 'down', 'no signal', 'exam', 'dead', 'completely off',
+            'elevator', 'stuck', 'shattered', 'collapsed', 'falling', 'broken glass',
+            'toxic', 'chemical', 'hazard', 'glass', 'vandalism', 'urgent', 'emergency', 'danger', 'safety', 'hurt', 'injury'
+        ];
+
+        const mediumKeywords = [
+            'slow', 'lagging', 'disconnecting', 'intermittent',
+            'flicker', 'blink', 'fused', 'not working', 'rattle', 'noise', 'sound',
+            'smell', 'odor', 'dirty', 'trash', 'clog', 'blocked',
+            'squeak', 'loose', 'cracked', 'stuck', 'jammed', 'torn', 'damaged'
+        ];
+
+        const hasHighKeyword = highKeywords.some(kw => description.includes(kw));
+        const hasMediumKeyword = mediumKeywords.some(kw => description.includes(kw));
+
+        if (hasHighKeyword) {
+            suggestedPriority = 'High';
+        } else if (hasMediumKeyword) {
+            suggestedPriority = 'Medium';
+        } else {
+            if (category === 'Water' || category === 'Electrical') {
+                suggestedPriority = 'Medium';
+            } else {
+                suggestedPriority = 'Low';
+            }
+        }
+
+        prioritySuggestionEl.className = 'suggestion-text active ' + suggestedPriority.toLowerCase();
+        prioritySuggestionEl.innerHTML = `💡 Suggested Priority: <strong>${suggestedPriority}</strong>. <span class="suggestion-link" id="applySuggestionBtn">Click to apply</span>`;
+
+        document.getElementById('applySuggestionBtn').addEventListener('click', () => {
+            prioritySelect.value = suggestedPriority;
+        });
+    }
+
+    categorySelect.addEventListener('change', updatePrioritySuggestion);
+    descriptionInput.addEventListener('input', updatePrioritySuggestion);
 
     // Escape helper for HTML insertion
     function escapeHTML(str) {

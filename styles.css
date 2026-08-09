@@ -655,6 +655,59 @@ footer {
     background-color: rgba(15, 23, 42, 0.5);
 }
 
+/* --- Smart Suggestion Stylings --- */
+.suggestion-text {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    transition: var(--transition-fast);
+    display: none;
+    padding: 0.5rem 0.75rem;
+    background-color: rgba(99, 102, 241, 0.05);
+    border: 1px dashed rgba(99, 102, 241, 0.2);
+    border-radius: var(--radius-sm);
+    animation: fadeInDown 0.3s ease;
+}
+
+.suggestion-text.active {
+    display: block;
+}
+
+.suggestion-text .suggestion-link {
+    color: #818cf8;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.suggestion-text .suggestion-link:hover {
+    color: #a5b4fc;
+}
+
+.suggestion-text.high {
+    background-color: rgba(239, 68, 68, 0.05);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+.suggestion-text.high .suggestion-link {
+    color: #f87171;
+}
+
+.suggestion-text.medium {
+    background-color: rgba(249, 115, 22, 0.05);
+    border-color: rgba(249, 115, 22, 0.2);
+}
+.suggestion-text.medium .suggestion-link {
+    color: #fb923c;
+}
+
+.suggestion-text.low {
+    background-color: rgba(148, 163, 184, 0.05);
+    border-color: rgba(148, 163, 184, 0.2);
+}
+.suggestion-text.low .suggestion-link {
+    color: #cbd5e1;
+}
+
 /* --- Animations --- */
 @keyframes fadeInDown {
     from {
