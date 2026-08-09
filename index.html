@@ -7,7 +7,12 @@
     <title>CampusFix | Campus Issue Reporting</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -27,18 +32,122 @@
 
     <!-- Hero Section -->
     <section class="hero">
+
         <div class="hero-content">
-            <h1>Make Your Campus Better.</h1>
+
+            <span class="hero-eyebrow">CAMPUS ISSUE MANAGEMENT</span>
+
+            <h1>
+                Make Your<br>
+                Campus <span>Better.</span>
+            </h1>
 
             <p>
                 Report campus problems, track their progress,
                 and help create a better environment for everyone.
             </p>
 
-            <a href="#report" class="primary-btn">
-                Report an Issue
-            </a>
+            <div class="hero-actions">
+                <a href="#report" class="primary-btn">
+                    Report an Issue
+                </a>
+
+                <a href="#dashboard" class="hero-secondary-btn">
+                    Explore Campus →
+                </a>
+            </div>
+
         </div>
+
+
+        <!-- Campus Visual -->
+
+        <div class="campus-visual">
+
+            <div class="campus-glow"></div>
+
+            <!-- Floating issue cards -->
+
+            <div class="floating-card floating-card-one">
+                <span class="floating-icon">💧</span>
+                <div>
+                    <strong>Water Leakage</strong>
+                    <small>In Progress</small>
+                </div>
+            </div>
+
+            <div class="floating-card floating-card-two">
+                <span class="floating-icon">📶</span>
+                <div>
+                    <strong>WiFi Issue</strong>
+                    <small>Pending</small>
+                </div>
+            </div>
+
+
+            <!-- Campus Building -->
+
+            <div class="campus-ground">
+
+                <div class="campus-building">
+
+                    <div class="building-roof"></div>
+
+                    <div class="building-main">
+
+                        <div class="building-sign">
+                            CAMPUS
+                        </div>
+
+                        <div class="building-windows">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+
+                        <div class="building-door"></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Trees -->
+
+                <div class="tree tree-one">
+                    <div class="tree-top"></div>
+                    <div class="tree-trunk"></div>
+                </div>
+
+                <div class="tree tree-two">
+                    <div class="tree-top"></div>
+                    <div class="tree-trunk"></div>
+                </div>
+
+
+                <!-- Issue markers -->
+
+                <div class="issue-marker marker-one">
+                    <span>!</span>
+                </div>
+
+                <div class="issue-marker marker-two">
+                    <span>✓</span>
+                </div>
+
+            </div>
+
+        </div>
+
     </section>
 
     <!-- Dashboard -->
@@ -76,9 +185,60 @@
             </div>
 
         </div>
+        <!-- Campus Health -->
+        <section class="campus-health">
+
+            <div class="health-header">
+                <div>
+                    <span class="health-label">CAMPUS HEALTH</span>
+                    <h3>Resolution Rate</h3>
+                    <p>How effectively reported issues are being resolved.</p>
+                </div>
+
+                <div class="health-percentage">
+                    <span id="resolutionRate">0%</span>
+                </div>
+            </div>
+
+            <div class="health-progress">
+                <div id="healthProgressBar" class="health-progress-fill"></div>
+            </div>
+
+            <div class="health-footer">
+                <span id="healthMessage">No issues resolved yet.</span>
+                <span id="healthCount">0 of 0 resolved</span>
+            </div>
+
+        </section>
+
+        <!-- Campus Insights -->
+    </section>
+    <!-- Campus Insights -->
+    <section class="insights section">
+
+        <div class="section-heading">
+            <h2>Where Campus Needs Attention</h2>
+            <p>See which areas are generating the most reports.</p>
+        </div>
+
+        <div id="categoryInsights" class="category-insights">
+            <!-- Insights will be generated using JavaScript -->
+        </div>
 
     </section>
+    <!-- Recent Campus Activity -->
+    <section class="activity section">
 
+        <div class="section-heading">
+            <h2>Recent Campus Activity</h2>
+            <p>Stay updated with the latest reported issues.</p>
+        </div>
+
+        <div id="activityList" class="activity-list">
+            <!-- Activity will be generated using JavaScript -->
+        </div>
+
+    </section>
     <!-- Report Issue -->
     <section id="report" class="report section">
 
